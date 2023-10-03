@@ -1,7 +1,5 @@
 .App {
   text-align: center;
-  background-color: #000;
-  color: #fff;
 }
 
 .App-logo {
@@ -10,14 +8,14 @@
 }
 
 .App-header {
-  background-color: #000;
+  background-color: #282c34;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-  color: #fff;
+  color: white;
 }
 
 .App-link {
@@ -30,25 +28,4 @@
 
 .small {
   font-size: 0.75rem;
-  color: #fff;
-}
-
-.container {
-  background-color: #000;
-  color: #fff;
-}
-
-.buttonClass {
-  background-color: #000;
-  color: #fff;
-}
-
-.select {
-  background-color: #000;
-  color: #fff;
-}
-
-.textarea {
-  background-color: #000;
-  color: #fff;
 }
