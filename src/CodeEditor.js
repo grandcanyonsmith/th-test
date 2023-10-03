@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import ReferenceFileSelector from './ReferenceFileSelector';
 import LoginPage from './Login';
+
 const Button = ({ onClick, children, active }) => {
   const buttonClass = `px-4 py-2 font-bold text-white bg-gray-800 hover:bg-gray-700 rounded-t-lg ${active ? 'bg-gray-700' : ''}`;
   return (
@@ -44,55 +45,59 @@ const CodeEditor = (props) => {
   const fileOptions = githubRepoFiles.map(file => ({ value: file.download_url, label: file.name }));
 
   return (
-    <div className="container mx-auto p-4 bg-gray-900 text-white">
-      <div className="flex justify-start mb-4">
-        <Button onClick={() => handleActiveViewChange('output')} active={activeView === 'output'}><i data-feather="eye"></i></Button>
-        <Button onClick={() => handleActiveViewChange('code')} active={activeView === 'code'}><i data-feather="code"></i></Button>
-      </div>
-      <div className="flex justify-between mb-4">
-        <Select value={selectedGithubRepo} onChange={handleGithubRepoChange} options={repoOptions} />
-        <Select value={selectedGithubRepoFile} onChange={handleGithubRepoFileChange} options={fileOptions} />
-      </div>
-      <div className="flex flex-col h-screen">
-        <div className="flex-grow">
-          {activeView === 'code' ? (
-            <pre className="bg-gray-800 rounded shadow-lg p-4 language-html">{sourceCode}</pre>
-          ) : (
-            <iframe 
-              title="Code Output"
-              key={sourceCode} 
-              className="bg-gray-800 rounded shadow-lg p-4" 
-              srcDoc={codePreview} 
-              style={{height: '100vh', width: '100%'}}
-            />
-          )}
+    <>
+      <div className="container mx-auto p-4 bg-gray-900 text-white">
+        <div className="flex justify-start mb-4">
+          <Button onClick={() => handleActiveViewChange('output')} active={activeView === 'output'}><i data-feather="eye"></i></Button>
+          <Button onClick={() => handleActiveViewChange('code')} active={activeView === 'code'}><i data-feather="code"></i></Button>
         </div>
-        <textarea
-          value={userRequest}
-          onChange={e => setUserRequest(e.target.value)}
-          className="bg-gray-800 text-white"
-        />
-      </div>
-      <div className="flex justify-between mt-4">
-        <div className="flex flex-col justify-between h-full">
-          <Button onClick={() => setReferenceFileSelectorVisible(true)}><i data-feather="plus" className="h-4 w-4"></i></Button>
-          <Button onClick={handleUserRequest}><i data-feather="send" className="h-4 w-4"></i></Button>
-          <Button onClick={handleSaveSourceCode}><i data-feather="save" className="h-4 w-4"></i></Button>
+        <div className="flex justify-between mb-4">
+          <Select value={selectedGithubRepo} onChange={handleGithubRepoChange} options={repoOptions} />
+          <Select value={selectedGithubRepoFile} onChange={handleGithubRepoFileChange} options={fileOptions} />
         </div>
+        <div className="flex flex-col h-screen">
+          <div className="flex-grow">
+            {activeView === 'code' ? (
+              <pre className="bg-gray-800 rounded shadow-lg p-4 language-html">{sourceCode}</pre>
+            ) : (
+              <iframe 
+                title="Code Output"
+                key={sourceCode} 
+                className="bg-gray-800 rounded shadow-lg p-4" 
+                srcDoc={codePreview} 
+                style={{height: '100vh', width: '100%'}}
+              />
+            )}
+          </div>
+          <textarea
+            value={userRequest}
+            onChange={e => setUserRequest(e.target.value)}
+            className="bg-gray-800 text-white"
+          />
+        </div>
+        <div className="flex justify-between mt-4">
+          <div className="flex flex-col justify-between h-full">
+            <Button onClick={() => setReferenceFileSelectorVisible(true)}><i data-feather="plus" className="h-4 w-4"></i></Button>
+            <Button onClick={handleUserRequest}><i data-feather="send" className="h-4 w-4"></i></Button>
+            <Button onClick={handleSaveSourceCode}><i data-feather="save" className="h-4 w-4"></i></Button>
+          </div>
+        </div>
+        {isReferenceFileSelectorVisible && (
+          <ReferenceFileSelector 
+            githubRepos={githubRepos} 
+            selectedGithubRepo={selectedGithubRepo} 
+            handleGithubRepoChange={handleGithubRepoChange} 
+            githubRepoFiles={githubRepoFiles} 
+            selectedGithubRepoFile={selectedGithubRepoFile}
+            handleGithubRepoFileChange={handleGithubRepoFileChange} 
+            closeReferenceFileSelector={() => setReferenceFileSelectorVisible(false)}
+          />
+        )}
       </div>
-      {isReferenceFileSelectorVisible && (
-        <ReferenceFileSelector 
-          githubRepos={githubRepos} 
-          selectedGithubRepo={selectedGithubRepo} 
-          handleGithubRepoChange={handleGithubRepoChange} 
-          githubRepoFiles={githubRepoFiles} 
-          selectedGithubRepoFile={selectedGithubRepoFile}
-          handleGithubRepoFileChange={handleGithubRepoFileChange} 
-          closeReferenceFileSelector={() => setReferenceFileSelectorVisible(false)}
-        />
-      )}
-<LoginPage></LoginPage>
-    </div>
+      <div>
+        <LoginPage />
+      </div>
+    </>
   );
 };
 
