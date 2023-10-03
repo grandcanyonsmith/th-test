@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import 'tailwindcss/tailwind.css';
 import 'prismjs/themes/prism-okaidia.css';
@@ -7,27 +7,20 @@ import CodeEditor from './CodeEditor';
 
 const API_URL = 'https://flask-hello-world2-three.vercel.app/';
 
-const useFetchRepos = () => {
-  const [repos, setRepos] = useState([]);
+const useFetch = (url, method, body) => {
+  const [data, setData] = useState([]);
   useEffect(() => {
-    axios.get(`${API_URL}github_repos_list`)
-      .then(({ data }) => setRepos(data))
-      .catch(console.error);
-  }, []);
-  return repos;
-};
-
-
-const useFetchFiles = (selectedRepo) => {
-  const [files, setFiles] = useState([]);
-  useEffect(() => {
-    if (selectedRepo) {
-      axios.post(`${API_URL}get_all_contents`, { repo_name: selectedRepo })
-        .then(({ data }) => setFiles(data))
-        .catch(console.error);
-    }
-  }, [selectedRepo]);
-  return files;
+    const fetchData = async () => {
+      try {
+        const response = await axios({ url, method, data: body });
+        setData(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchData();
+  }, [url, method, body]);
+  return data;
 };
 
 const useFeatherIcons = (view) => {
@@ -41,69 +34,55 @@ const EnhancedCodeEditor = () => {
   const [selectedRepo, setSelectedRepo] = useState('');
   const [selectedFile, setSelectedFile] = useState('');
   const [code, setCode] = useState('');
-
   const [output, setOutput] = useState('');
   const [view, setView] = useState('code');
   const [textareaValue, setTextareaValue] = useState('');
   const textareaValueRef = useRef();
-  
 
-  // Update the ref whenever textareaValue changes
   useEffect(() => {
     textareaValueRef.current = textareaValue;
   }, [textareaValue]);
 
-  const repos = useFetchRepos();
-  const files = useFetchFiles(selectedRepo);
-  
+  const repos = useFetch(`${API_URL}github_repos_list`, 'get');
+  const files = useFetch(`${API_URL}get_all_contents`, 'post', { repo_name: selectedRepo });
+
   useFeatherIcons(view);
 
   const handleRepoChange = (e) => setSelectedRepo(e.target.value);
 
   const handleFileChange = async (e) => {
     setSelectedFile(e.target.value);
-    try {
-      const { data } = await axios.get(e.target.value);
-      setCode(data || ''); // set code to empty string if data is undefined
-      if (e.target.options[e.target.selectedIndex].text.endsWith('.html')) {
-        setView('output');
-        setOutput(data);
-      } else {
-        setView('code');
-      }
-    } catch (error) {
-      console.error('Error fetching file content:', error);
-      setCode(''); // set code to empty string if there's an error
+    const { data } = await axios.get(e.target.value);
+    setCode(data || '');
+    if (e.target.options[e.target.selectedIndex].text.endsWith('.html')) {
+      setView('output');
+      setOutput(data);
+    } else {
+      setView('code');
     }
   };
 
-
-  const handleRunCode = () => {
+  const handleRunCode = async () => {
     const event_data = {
       fileName: selectedFile,
       code: code,
-      request: textareaValueRef.current, // Use the ref instead of the state
+      request: textareaValueRef.current,
       repoName: selectedRepo,
     };
-  
-    console.log('Sending POST request with data:', event_data);
-  
-    fetch('https://uslbd6l6ssolgomdrcdhnqa5me0rnsee.lambda-url.us-west-2.on.aws/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(event_data),
-    })
-    .then(response => response.json())
-    .then(data => {
-      console.log('Success:', data);
-      setCode(data.fileContents || ''); // set code to empty string if fileContents is undefined
-    })
-    .catch((error) => {
+    try {
+      const response = await fetch('https://uslbd6l6ssolgomdrcdhnqa5me0rnsee.lambda-url.us-west-2.on.aws/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(event_data),
+      });
+      const data = await response.json();
+      setCode(data.fileContents || '');
+    } catch (error) {
       console.error('Error:', error);
-      setCode(''); // set code to empty string if there's an error
-    });
+      setCode('');
+    }
   };
 
   const handleSaveCode = async () => {
@@ -124,10 +103,8 @@ const EnhancedCodeEditor = () => {
 
   return (
     <CodeEditor
-    
-        textareaValue={textareaValue}
-    setTextareaValue={setTextareaValue}
-
+      textareaValue={textareaValue}
+      setTextareaValue={setTextareaValue}
       modalVisible={modalVisible}
       setModalVisible={setModalVisible}
       repos={repos}
@@ -143,13 +120,8 @@ const EnhancedCodeEditor = () => {
       handleRunCode={handleRunCode}
       handleSaveCode={handleSaveCode}
       handleViewChange={handleViewChange}
-
     />
   );
 };
 
 export default EnhancedCodeEditor;
-
-
-
-
