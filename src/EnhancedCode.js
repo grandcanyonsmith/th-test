@@ -23,51 +23,51 @@ const useFetch = (url, method, body) => {
   return data;
 };
 
-const useFeatherIcons = (view) => {
+const useFeatherIcons = (activeView) => {
   useEffect(() => {
     feather.replace();
-  }, [view]);
+  }, [activeView]);
 };
 
 const EnhancedCodeEditor = () => {
-  const [modalVisible, setModalVisible] = useState(false);
-  const [selectedRepo, setSelectedRepo] = useState('');
-  const [selectedFile, setSelectedFile] = useState('');
-  const [code, setCode] = useState('');
-  const [output, setOutput] = useState('');
-  const [view, setView] = useState('code');
-  const [textareaValue, setTextareaValue] = useState('');
-  const textareaValueRef = useRef();
+  const [isReferenceFileSelectorVisible, setReferenceFileSelectorVisible] = useState(false);
+  const [selectedGithubRepo, setSelectedGithubRepo] = useState('');
+  const [selectedGithubRepoFile, setSelectedGithubRepoFile] = useState('');
+  const [sourceCode, setSourceCode] = useState('');
+  const [codePreview, setCodePreview] = useState('');
+  const [activeView, setActiveView] = useState('code');
+  const [userRequest, setUserRequest] = useState('');
+  const userRequestRef = useRef();
 
   useEffect(() => {
-    textareaValueRef.current = textareaValue;
-  }, [textareaValue]);
+    userRequestRef.current = userRequest;
+  }, [userRequest]);
 
-  const repos = useFetch(`${API_URL}github_repos_list`, 'get');
-  const files = useFetch(`${API_URL}get_all_contents`, 'post', { repo_name: selectedRepo });
+  const githubRepos = useFetch(`${API_URL}github_repos_list`, 'get');
+  const githubRepoFiles = useFetch(`${API_URL}get_all_contents`, 'post', { repo_name: selectedGithubRepo });
 
-  useFeatherIcons(view);
+  useFeatherIcons(activeView);
 
-  const handleRepoChange = (e) => setSelectedRepo(e.target.value);
+  const handleGithubRepoSelection = (e) => setSelectedGithubRepo(e.target.value);
 
-  const handleFileChange = async (e) => {
-    setSelectedFile(e.target.value);
+  const handleGithubRepoFileSelection = async (e) => {
+    setSelectedGithubRepoFile(e.target.value);
     const { data } = await axios.get(e.target.value);
-    setCode(data || '');
+    setSourceCode(data || '');
     if (e.target.options[e.target.selectedIndex].text.endsWith('.html')) {
-      setView('output');
-      setOutput(data);
+      setActiveView('output');
+      setCodePreview(data);
     } else {
-      setView('code');
+      setActiveView('code');
     }
   };
 
-  const handleRunCode = async () => {
+  const handleUserRequest = async () => {
     const event_data = {
-      fileName: selectedFile,
-      code: code,
-      request: textareaValueRef.current,
-      repoName: selectedRepo,
+      fileName: selectedGithubRepoFile,
+      code: sourceCode,
+      request: userRequestRef.current,
+      repoName: selectedGithubRepo,
     };
     try {
       const response = await fetch('https://uslbd6l6ssolgomdrcdhnqa5me0rnsee.lambda-url.us-west-2.on.aws/', {
@@ -78,48 +78,48 @@ const EnhancedCodeEditor = () => {
         body: JSON.stringify(event_data),
       });
       const data = await response.json();
-      setCode(data.fileContents || '');
+      setSourceCode(data.fileContents || '');
     } catch (error) {
       console.error('Error:', error);
-      setCode('');
+      setSourceCode('');
     }
   };
 
-  const handleSaveCode = async () => {
+  const handleSaveSourceCode = async () => {
     try {
-      await axios.post(`${API_URL}update`, { code });
+      await axios.post(`${API_URL}update`, { code: sourceCode });
       alert('Code saved successfully!');
     } catch (error) {
       console.error('Error saving code:', error);
     }
   };
 
-  const handleViewChange = (newView) => {
-    setView(newView);
+  const handleActiveViewChange = (newView) => {
+    setActiveView(newView);
     if (newView === 'output') {
-      setOutput(code);
+      setCodePreview(sourceCode);
     }
   };
 
   return (
     <CodeEditor
-      textareaValue={textareaValue}
-      setTextareaValue={setTextareaValue}
-      modalVisible={modalVisible}
-      setModalVisible={setModalVisible}
-      repos={repos}
-      selectedRepo={selectedRepo}
-      handleRepoChange={handleRepoChange}
-      files={files}
-      selectedFile={selectedFile}
-      handleFileChange={handleFileChange}
-      code={code}
-      setCode={setCode}
-      output={output}
-      view={view}
-      handleRunCode={handleRunCode}
-      handleSaveCode={handleSaveCode}
-      handleViewChange={handleViewChange}
+      userRequest={userRequest}
+      setUserRequest={setUserRequest}
+      isReferenceFileSelectorOpen={isReferenceFileSelectorVisible}
+      closeReferenceFileSelector={setReferenceFileSelectorVisible}
+      githubRepos={githubRepos}
+      selectedGithubRepo={selectedGithubRepo}
+      handleGithubRepoSelection={handleGithubRepoSelection}
+      githubRepoFiles={githubRepoFiles}
+      selectedGithubRepoFile={selectedGithubRepoFile}
+      handleGithubRepoFileSelection={handleGithubRepoFileSelection}
+      sourceCode={sourceCode}
+      setSourceCode={setSourceCode}
+      codePreview={codePreview}
+      activeView={activeView}
+      handleUserRequest={handleUserRequest}
+      handleSaveSourceCode={handleSaveSourceCode}
+      handleActiveViewChange={handleActiveViewChange}
     />
   );
 };
