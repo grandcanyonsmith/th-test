@@ -48,7 +48,10 @@ const EnhancedCodeEditor = () => {
 
   useFeatherIcons(activeView);
 
-  const handleGithubRepoSelection = (e) => setSelectedGithubRepo(e.target.value);
+  const handleGithubRepoSelection = (e) => {
+    setSelectedGithubRepo(e.target.value);
+    setSelectedGithubRepoFile('');
+  };
 
   const handleGithubRepoFileSelection = async (e) => {
     setSelectedGithubRepoFile(e.target.value);
