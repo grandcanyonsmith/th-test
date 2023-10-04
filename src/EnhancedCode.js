@@ -11,11 +11,13 @@ const useFetch = (url, method, body) => {
   const [data, setData] = useState([]);
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const response = await axios({ url, method, data: body });
-        setData(response.data);
-      } catch (error) {
-        console.error(error);
+      if (body && body.repo_name) {
+        try {
+          const response = await axios({ url, method, data: body });
+          setData(response.data);
+        } catch (error) {
+          console.error(error);
+        }
       }
     };
     fetchData();
