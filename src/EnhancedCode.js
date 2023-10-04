@@ -108,8 +108,11 @@ const EnhancedCodeEditor = () => {
     <CodeEditor
       userRequest={userRequest}
       setUserRequest={setUserRequest}
-      isReferenceFileSelectorOpen={isReferenceFileSelectorVisible}
-      closeReferenceFileSelector={setReferenceFileSelectorVisible}
+      isReferenceFileSelectorVisible={isReferenceFileSelectorVisible}
+  handleGithubRepoChange={handleGithubRepoSelection}
+  handleGithubRepoFileChange={handleGithubRepoFileSelection}
+
+        closeReferenceFileSelector={() => setReferenceFileSelectorVisible(false)}
       githubRepos={githubRepos}
       selectedGithubRepo={selectedGithubRepo}
       handleGithubRepoSelection={handleGithubRepoSelection}
@@ -117,6 +120,7 @@ const EnhancedCodeEditor = () => {
       selectedGithubRepoFile={selectedGithubRepoFile}
       handleGithubRepoFileSelection={handleGithubRepoFileSelection}
       sourceCode={sourceCode}
+      setReferenceFileSelectorVisible={setReferenceFileSelectorVisible}
       setSourceCode={setSourceCode}
       codePreview={codePreview}
       activeView={activeView}
@@ -128,3 +132,4 @@ const EnhancedCodeEditor = () => {
 };
 
 export default EnhancedCodeEditor;
+

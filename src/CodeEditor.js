@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import ReferenceFileSelector from './ReferenceFileSelector';
+import EnhancedCodeEditor from './EnhancedCode';
 
 const Button = ({ onClick, children, active }) => {
   const buttonClass = `px-4 py-2 font-bold text-white bg-gray-800 hover:bg-gray-700 rounded-t-lg ${active ? 'bg-gray-700' : ''}`;
@@ -43,19 +44,29 @@ const ToggleCodeView = ({ activeView, sourceCode, codePreview }) => (
   </div>
 );
 
-const UserRequestButtonsContainer = ({ setReferenceFileSelectorVisible, handleUserRequest, handleSaveSourceCode }) => (
-  <div className="flex flex-col justify-between h-full">
-    <Button onClick={() => setReferenceFileSelectorVisible(true)}><i data-feather="plus" className="h-4 w-4"></i></Button>
-    <Button onClick={handleUserRequest}><i data-feather="send" className="h-4 w-4"></i></Button>
-    <Button onClick={handleSaveSourceCode}><i data-feather="save" className="h-4 w-4"></i></Button>
-  </div>
-);
+const UserRequestButtonsContainer = ({ handleUserRequest, handleSaveSourceCode }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  return (
+    <div className="flex flex-col justify-between h-full">
+      <Button onClick={() => setIsModalOpen(true)}><i data-feather="plus" className="h-4 w-4"></i></Button>
+      {isModalOpen && (
+        <div className="modal">
+          {/* Modal content goes here */}
+          <button onClick={() => setIsModalOpen(false)}>Close</button>
+        </div>
+      )}
+      <Button onClick={handleUserRequest}><i data-feather="send" className="h-4 w-4"></i></Button>
+      <Button onClick={handleSaveSourceCode}><i data-feather="save" className="h-4 w-4"></i></Button>
+    </div>
+  );
+};
 
 const UserRequestInputContainer = ({ userRequest, setUserRequest }) => (
   <textarea
     value={userRequest}
     onChange={e => setUserRequest(e.target.value)}
-    className="bg-gray-800 text-white"
+    className="bg-gray-800 text-white flex-grow"
   />
 );
 
@@ -83,7 +94,6 @@ const CodeEditor = (props) => {
   const fileOptions = githubRepoFiles.map(file => ({ value: file.download_url, label: file.name }));
 
   return (
-    <>
       <div className="container mx-auto p-4 bg-gray-900 text-white">
         <div className="flex justify-start mb-4">
           <Button onClick={() => handleActiveViewChange('output')} active={activeView === 'output'}><i data-feather="eye"></i></Button>
@@ -102,25 +112,23 @@ const CodeEditor = (props) => {
           <UserRequestInputContainer userRequest={userRequest} setUserRequest={setUserRequest} />
         </div>
         <div className="flex justify-between mt-4">
-          <UserRequestButtonsContainer 
-            setReferenceFileSelectorVisible={setReferenceFileSelectorVisible} 
-            handleUserRequest={handleUserRequest} 
-            handleSaveSourceCode={handleSaveSourceCode} 
-          />
+        <UserRequestButtonsContainer 
+  handleUserRequest={handleUserRequest} 
+  handleSaveSourceCode={handleSaveSourceCode} 
+/>
         </div>
         {isReferenceFileSelectorVisible && (
-          <ReferenceFileSelector 
-            githubRepos={githubRepos} 
-            selectedGithubRepo={selectedGithubRepo} 
-            handleGithubRepoChange={handleGithubRepoChange} 
-            githubRepoFiles={githubRepoFiles} 
-            selectedGithubRepoFile={selectedGithubRepoFile}
-            handleGithubRepoFileChange={handleGithubRepoFileChange} 
-            closeReferenceFileSelector={() => setReferenceFileSelectorVisible(false)}
-          />
-        )}
+  <ReferenceFileSelector 
+    githubRepos={githubRepos} 
+    selectedGithubRepo={selectedGithubRepo} 
+    handleGithubRepoChange={handleGithubRepoChange} 
+    githubRepoFiles={githubRepoFiles} 
+    selectedGithubRepoFile={selectedGithubRepoFile}
+    handleGithubRepoFileChange={handleGithubRepoFileChange} 
+    closeReferenceFileSelector={() => setReferenceFileSelectorVisible(false)}
+  />
+)}
       </div>
-    </>
   );
 };
 

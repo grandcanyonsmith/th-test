@@ -1,10 +1,26 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
-const ReferenceFileSelector = ({ githubRepos, githubRepoFiles, isReferenceFileSelectorOpen, closeReferenceFileSelector }) => {
-  console.log(githubRepoFiles); // This will log the githubRepoFiles prop to the console
+const ReferenceFileSelector = ({ isReferenceFileSelectorOpen, closeReferenceFileSelector, fetchGithubRepos, fetchGithubRepoFiles }) => {
+  
 
-  const [selectedGithubRepo, setSelectedGithubRepo] = React.useState(githubRepos && githubRepos.length > 0 ? githubRepos[0] : '');
-  const [selectedGithubRepoFile, setSelectedGithubRepoFile] = React.useState(githubRepoFiles && githubRepoFiles.length > 0 ? githubRepoFiles[0] : null);
+  const [githubRepos, setGithubRepos] = useState([]);
+  const [githubRepoFiles, setGithubRepoFiles] = useState([]);
+  const [selectedGithubRepo, setSelectedGithubRepo] = useState('');
+  const [selectedGithubRepoFile, setSelectedGithubRepoFile] = useState(null);
+
+  useEffect(() => {
+    if (isReferenceFileSelectorOpen) {
+      fetchGithubRepos().then(repos => {
+        setGithubRepos(repos);
+        setSelectedGithubRepo(repos[0]);
+      });
+
+      fetchGithubRepoFiles().then(files => {
+        setGithubRepoFiles(files);
+        setSelectedGithubRepoFile(files[0]);
+      });
+    }
+  }, [isReferenceFileSelectorOpen]);
 
   const handleGithubRepoSelection = (e) => {
     setSelectedGithubRepo(e.target.value);
