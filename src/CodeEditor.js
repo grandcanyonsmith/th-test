@@ -20,6 +20,45 @@ const Select = ({ value, onChange, options }) => {
   );
 };
 
+const Dropdowns = ({ selectedGithubRepo, handleGithubRepoChange, repoOptions, selectedGithubRepoFile, handleGithubRepoFileChange, fileOptions }) => (
+  <div className="flex justify-between mb-4">
+    <Select value={selectedGithubRepo} onChange={handleGithubRepoChange} options={repoOptions} />
+    <Select value={selectedGithubRepoFile} onChange={handleGithubRepoFileChange} options={fileOptions} />
+  </div>
+);
+
+const ToggleCodeView = ({ activeView, sourceCode, codePreview }) => (
+  <div className="flex-grow">
+    {activeView === 'code' ? (
+      <pre className="bg-gray-800 rounded shadow-lg p-4 language-html">{sourceCode}</pre>
+    ) : (
+      <iframe 
+        title="Code Output"
+        key={sourceCode} 
+        className="bg-gray-800 rounded shadow-lg p-4" 
+        srcDoc={codePreview} 
+        style={{height: '100vh', width: '100%'}}
+      />
+    )}
+  </div>
+);
+
+const UserRequestButtonsContainer = ({ setReferenceFileSelectorVisible, handleUserRequest, handleSaveSourceCode }) => (
+  <div className="flex flex-col justify-between h-full">
+    <Button onClick={() => setReferenceFileSelectorVisible(true)}><i data-feather="plus" className="h-4 w-4"></i></Button>
+    <Button onClick={handleUserRequest}><i data-feather="send" className="h-4 w-4"></i></Button>
+    <Button onClick={handleSaveSourceCode}><i data-feather="save" className="h-4 w-4"></i></Button>
+  </div>
+);
+
+const UserRequestInputContainer = ({ userRequest, setUserRequest }) => (
+  <textarea
+    value={userRequest}
+    onChange={e => setUserRequest(e.target.value)}
+    className="bg-gray-800 text-white"
+  />
+);
+
 const CodeEditor = (props) => {
   const {
     isReferenceFileSelectorVisible,
@@ -50,36 +89,24 @@ const CodeEditor = (props) => {
           <Button onClick={() => handleActiveViewChange('output')} active={activeView === 'output'}><i data-feather="eye"></i></Button>
           <Button onClick={() => handleActiveViewChange('code')} active={activeView === 'code'}><i data-feather="code"></i></Button>
         </div>
-        <div className="flex justify-between mb-4">
-          <Select value={selectedGithubRepo} onChange={handleGithubRepoChange} options={repoOptions} />
-          <Select value={selectedGithubRepoFile} onChange={handleGithubRepoFileChange} options={fileOptions} />
-        </div>
+        <Dropdowns 
+          selectedGithubRepo={selectedGithubRepo} 
+          handleGithubRepoChange={handleGithubRepoChange} 
+          repoOptions={repoOptions} 
+          selectedGithubRepoFile={selectedGithubRepoFile} 
+          handleGithubRepoFileChange={handleGithubRepoFileChange} 
+          fileOptions={fileOptions} 
+        />
         <div className="flex flex-col h-screen">
-          <div className="flex-grow">
-            {activeView === 'code' ? (
-              <pre className="bg-gray-800 rounded shadow-lg p-4 language-html">{sourceCode}</pre>
-            ) : (
-              <iframe 
-                title="Code Output"
-                key={sourceCode} 
-                className="bg-gray-800 rounded shadow-lg p-4" 
-                srcDoc={codePreview} 
-                style={{height: '100vh', width: '100%'}}
-              />
-            )}
-          </div>
-          <textarea
-            value={userRequest}
-            onChange={e => setUserRequest(e.target.value)}
-            className="bg-gray-800 text-white"
-          />
+          <ToggleCodeView activeView={activeView} sourceCode={sourceCode} codePreview={codePreview} />
+          <UserRequestInputContainer userRequest={userRequest} setUserRequest={setUserRequest} />
         </div>
         <div className="flex justify-between mt-4">
-          <div className="flex flex-col justify-between h-full">
-            <Button onClick={() => setReferenceFileSelectorVisible(true)}><i data-feather="plus" className="h-4 w-4"></i></Button>
-            <Button onClick={handleUserRequest}><i data-feather="send" className="h-4 w-4"></i></Button>
-            <Button onClick={handleSaveSourceCode}><i data-feather="save" className="h-4 w-4"></i></Button>
-          </div>
+          <UserRequestButtonsContainer 
+            setReferenceFileSelectorVisible={setReferenceFileSelectorVisible} 
+            handleUserRequest={handleUserRequest} 
+            handleSaveSourceCode={handleSaveSourceCode} 
+          />
         </div>
         {isReferenceFileSelectorVisible && (
           <ReferenceFileSelector 
