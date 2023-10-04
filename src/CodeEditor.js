@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import ReferenceFileSelector from './ReferenceFileSelector';
-import LoginPage from './Login';
 
 const Button = ({ onClick, children, active }) => {
   const buttonClass = `px-4 py-2 font-bold text-white bg-gray-800 hover:bg-gray-700 rounded-t-lg ${active ? 'bg-gray-700' : ''}`;
@@ -93,9 +92,6 @@ const CodeEditor = (props) => {
             closeReferenceFileSelector={() => setReferenceFileSelectorVisible(false)}
           />
         )}
-      </div>
-      <div>
-        <LoginPage />
       </div>
     </>
   );
