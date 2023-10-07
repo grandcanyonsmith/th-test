@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import ReferenceFileSelector from './ReferenceFileSelector';
-import EnhancedCodeEditor from './EnhancedCode';
 
 const Button = ({ onClick, children, active }) => {
   const buttonClass = `px-4 py-2 font-bold text-white bg-gray-800 hover:bg-gray-700 rounded-t-lg ${active ? 'bg-gray-700' : ''}`;
@@ -52,7 +51,6 @@ const UserRequestButtonsContainer = ({ handleUserRequest, handleSaveSourceCode }
       <Button onClick={() => setIsModalOpen(true)}><i data-feather="plus" className="h-4 w-4"></i></Button>
       {isModalOpen && (
         <div className="modal">
-          {/* Modal content goes here */}
           <button onClick={() => setIsModalOpen(false)}>Close</button>
         </div>
       )}
